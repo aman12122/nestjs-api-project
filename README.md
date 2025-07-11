@@ -1,98 +1,145 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS Authentication API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A secure REST API built with NestJS and TypeScript, featuring JWT authentication and type-safe data validation. This project was my first exploration into the NestJS framework and TypeScript backend development, helping me understand enterprise-grade Node.js architecture and modern backend patterns.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **JWT Authentication**: Secure user registration and login with JSON Web Tokens
+- **Type-Safe Validation**: DTO (Data Transfer Objects) with class-validator decorators
+- **Password Security**: Argon2 hashing for secure password storage
+- **Database Integration**: Prisma ORM with PostgreSQL for type-safe database operations
+- **Modular Architecture**: Clean separation of concerns using NestJS modules
+- **Docker Support**: Containerized database setup for development and testing
+- **Global Guards**: Protected routes using JWT strategy and Passport.js
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- **NestJS** - Progressive Node.js framework with TypeScript
+- **TypeScript** - Type-safe JavaScript development
+- **Prisma** - Modern ORM with type generation
+- **PostgreSQL** - Relational database
+- **JWT** - JSON Web Token authentication
+- **Argon2** - Password hashing algorithm
+- **Docker** - Containerization for databases
+- **Passport.js** - Authentication middleware
 
-```bash
-$ yarn install
+## API Endpoints
+
+### Authentication
+```
+POST   /auth/signup    # User registration with email/password
+POST   /auth/signin    # User login and JWT token generation
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+### User Management
+```
+GET    /users/me       # Get current user profile (protected)
+PATCH  /users          # Update user information (protected)
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+### Bookmarks (Planned)
+```
+# Future bookmark management endpoints
 ```
 
-## Deployment
+## What I Learned
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### NestJS Framework
+Coming from frontend development, NestJS initially felt complex with its heavy use of decorators, dependency injection, and modular structure. The learning curve included understanding:
+- How decorators like `@Controller`, `@Injectable`, and `@Module` work
+- Dependency injection and how services are automatically wired together
+- The request-response lifecycle and middleware integration
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### TypeScript Backend Development
+This project deepened my TypeScript knowledge beyond frontend applications:
+- Creating strongly-typed DTOs for request validation
+- Understanding how TypeScript interfaces work with database schemas
+- Leveraging type inference from Prisma client generation
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+### Modern Authentication Patterns
+Learning JWT authentication from scratch taught me:
+- How tokens are generated, signed, and verified
+- Implementing secure password hashing with Argon2
+- Creating authentication guards and strategies with Passport.js
+- Protecting routes and extracting user data from tokens
+
+### Data Transfer Objects (DTOs)
+The DTO pattern was new to me and proved invaluable for:
+- Validating incoming request data with class-validator
+- Ensuring type safety throughout the application
+- Creating a clear contract between client and server
+
+## Key Implementation Details
+
+### JWT Strategy
+```typescript
+// JWT validation and user extraction
+async validate(payload: { sub: number, email: string }) {
+  const user = await this.prisma.user.findUnique({
+    where: { id: payload.sub }
+  });
+  const { hash, ...userWithoutHash } = user || {};
+  return userWithoutHash;
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Type-Safe DTOs
+```typescript
+export class AuthDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
-## Resources
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Custom Decorators
+```typescript
+// Extract user from JWT token
+@Get('me')
+getMe(@GetUser() user: User) {
+  return user;
+}
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## System Architecture
 
-## Support
+```mermaid
+sequenceDiagram
+    participant Client
+    participant AuthController
+    participant AuthService
+    participant PrismaService
+    participant Database
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+    Note over Client, Database: User Registration Flow
+    Client->>AuthController: POST /auth/signup {email, password}
+    AuthController->>AuthService: signup(dto)
+    AuthService->>AuthService: hash password with Argon2
+    AuthService->>PrismaService: user.create()
+    PrismaService->>Database: INSERT user
+    Database-->>PrismaService: User created
+    PrismaService-->>AuthService: User object
+    AuthService->>AuthService: signToken(userId, email)
+    AuthService-->>AuthController: { access_token }
+    AuthController-->>Client: JWT token
 
-## Stay in touch
+    Note over Client, Database: Protected Route Access
+    Client->>AuthController: GET /users/me (Bearer token)
+    AuthController->>JwtGuard: validate token
+    JwtGuard->>JwtStrategy: validate(payload)
+    JwtStrategy->>PrismaService: findUnique(userId)
+    PrismaService->>Database: SELECT user
+    Database-->>PrismaService: User data
+    PrismaService-->>JwtStrategy: User object
+    JwtStrategy-->>JwtGuard: User (without hash)
+    JwtGuard-->>AuthController: User attached to request
+    AuthController-->>Client: User profile data
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+*This project represents my first deep dive into NestJS and TypeScript backend development, focusing on understanding enterprise patterns, type safety, and modern authentication practices.*
